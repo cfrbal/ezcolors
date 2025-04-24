@@ -212,7 +212,6 @@ The module contains explicitly defined functions for the following styles and co
 *   `ENDC`: The ANSI code (`\033[0m`) to reset all attributes. The generated functions add this automatically, but it's exposed for manual use.
 
 ## Advanced Usage and Considerations
-
 ### Manual Control with `ENDC`
 
 While functions automatically append the reset code, you might need `ENDC` for manual construction or multi-line styling:
