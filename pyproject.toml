@@ -5,12 +5,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ezcolors"
-version = "0.1.0" # Or your desired version
+version = "0.1.0"
 description = "Simple ANSI color/style wrapper functions for terminal output."
 readme = "README.md"
-license = { text = "MIT" } # Or your chosen license
-# Add classifiers, author info, etc. if desired
-# See: https://packaging.python.org/en/latest/specifications/pyproject-toml/
+license = { text = "MIT" }
 
 [tool.setuptools.packages.find]
-where = ["src"] # Tells setuptools to look for packages under src
+where = ["src"]
