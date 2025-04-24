@@ -11,7 +11,7 @@ Color your prints and terminal logs in an easy, modular, and straightforward way
 
 ## Development Approach: Code Generation
 
-This library uses a **build-time code generation** approach. Instead of generating functions dynamically every time the module is imported (runtime metaprogramming), a generator script (`tools/gen_implementation.py`) reads ANSI code definitions from a central file (`tools/_ezcolors_defs.py`) and creates several static files:
+This library uses a **build-time code generation** approach. Instead of generating functions dynamically every time the module is imported (runtime metaprogramming, the original approach I started this project with, for fun), a generator script (`tools/gen_implementation.py`) reads ANSI code definitions from a central file (`tools/_ezcolors_defs.py`) and creates several static files:
 
 1.  **`src/ezcolors.py`:** The main module containing explicitly defined Python functions (like `blue()`, `bold()`, etc.) for each code. This is the file users import.
 2.  **`src/ezcolors.pyi`:** A stub file providing type hints for all generated functions, enabling excellent IDE support (autocompletion, type checking) and linting.
