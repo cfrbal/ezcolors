@@ -12,7 +12,7 @@ This module uses metaprogramming to dynamically generate the color/style functio
 
 ## Features
 
-*   **Easy to Use:** Simple function calls like `okblue("text")` or `bold(warning("message"))`.
+*   **Easy to Use:** Simple function calls like `blue("text")` or `bold(warning("message"))`.
 *   **Zero Dependencies:** Uses only standard Python features.
 *   **Dynamic Generation:** Functions are automatically generated from defined ANSI codes, making extension easy.
 *   **Comprehensive Codes:** Includes common styles, standard foreground/background colors, and bright foreground/background colors.
@@ -66,10 +66,10 @@ Not available as of yet.
 Import the desired color or style functions and wrap your strings:
 
 ```python
-from ezcolors import okblue, bold, warning, okgreen, fail
+from ezcolors import blue, bold, warning, green, fail
 
 # Basic coloring
-print(okblue("This text is blue."))
+print(blue("This text is blue."))
 print(warning("This is a warning message."))
 
 # Nesting styles
@@ -78,8 +78,8 @@ print(bold(fail("This is a bold failure message!")))
 # Use within f-strings
 status = "OK"
 record_id = 123
-# Assuming 'okgreen' is generated (check your Available Functions list)
-print(f"Processing record {bold(record_id)}: Status = {okgreen(status)}")
+# Assuming 'green' is generated (check your Available Functions list)
+print(f"Processing record {bold(record_id)}: Status = {green(status)}")
 
 # Use directly in logging (see Considerations below)
 import logging
@@ -153,9 +153,9 @@ The module automatically generates functions for the following styles and colors
 *(These point to some of the bright colors above)*
 
 *   `header` _(Bright Magenta)_
-*   `okblue` _(Bright Blue)_
-*   `okcyan` _(Bright Cyan)_
-*   `okgreen` _(Bright Green)_
+*   `blue` _(Bright Blue)_
+*   `cyan` _(Bright Cyan)_
+*   `green` _(Bright Green)_
 *   `warning` _(Bright Yellow)_
 *   `fail` _(Bright Red)_
 
@@ -187,11 +187,11 @@ When running the `ezcolors.py` script directly from the command line, you can in
 While functions automatically append the reset code, you might need `ENDC` for manual construction or multi-line styling:
 
 ```python
-from ezcolors import bold, okgreen, ENDC
+from ezcolors import bold, green, ENDC
 
 print(bold("Important section starts...")) # Manually start bold
 print(" - Detail 1")
-print(f" - Status: {okgreen('All Good')}") # okgreen() resets automatically
+print(f" - Status: {green('All Good')}") # green() resets automatically
 print(bold(" - More bold details"))       # Need to re-apply bold
 print("Section ends." + ENDC)             # Manually reset at the very end
 ```
@@ -204,11 +204,11 @@ If you need clean output in files, you must add checks manually:
 
 ```python
 import sys
-from ezcolors import okblue # Use the actual function name
+from ezcolors import blue # Use the actual function name
 
 text = "Hello"
 if sys.stdout.isatty():
-    print(okblue(text))
+    print(blue(text))
 else:
     print(text)
 ```
