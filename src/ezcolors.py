@@ -1,193 +1,289 @@
-import sys
-import os
-import argparse
+ENDC = '\x1b[0m'
 
-# --- Global Color Configuration ---
+def bg_black(text: object) -> str:
+    """Wraps the input string with the 'BG_BLACK' ANSI code (<ESC>[40m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[40m{string_to_color}{ENDC}"
 
-# Check for common environment variables that might suggest disabling color
-_NO_COLOR = 'NO_COLOR' in os.environ
-_IS_DUMB_TERM = os.environ.get('TERM') == 'dumb'
+def bg_blue(text: object) -> str:
+    """Wraps the input string with the 'BG_BLUE' ANSI code (<ESC>[44m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[44m{string_to_color}{ENDC}"
 
-# Check if stdout is a TTY and we haven't explicitly disabled color
-# Default to True only if stdout is a TTY and NO_COLOR/dumb TERM isn't set.
-_DEFAULT_ENABLE_STATE = sys.stdout.isatty() and not _NO_COLOR and not _IS_DUMB_TERM
+def bg_bright_black(text: object) -> str:
+    """Wraps the input string with the 'BG_BRIGHT_BLACK' ANSI code (<ESC>[100m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[100m{string_to_color}{ENDC}"
 
-COLORS_ENABLED = _DEFAULT_ENABLE_STATE
+def bg_bright_blue(text: object) -> str:
+    """Wraps the input string with the 'BG_BRIGHT_BLUE' ANSI code (<ESC>[104m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[104m{string_to_color}{ENDC}"
 
-def enable_colors(check_stream=None):
-    """
-    Globally enables color output for ezcolors functions.
+def bg_bright_cyan(text: object) -> str:
+    """Wraps the input string with the 'BG_BRIGHT_CYAN' ANSI code (<ESC>[106m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[106m{string_to_color}{ENDC}"
 
-    Args:
-        check_stream: If provided (e.g., sys.stdout or sys.stderr),
-                      colors will only be enabled if check_stream.isatty()
-                      is true (and NO_COLOR/TERM=dumb are not set).
-                      If None, enables colors unconditionally.
-    """
-    global COLORS_ENABLED
-    if check_stream:
-        is_tty = hasattr(check_stream, 'isatty') and check_stream.isatty()
-        COLORS_ENABLED = is_tty and not _NO_COLOR and not _IS_DUMB_TERM
-    else:
-        # # Allow forcing colors on, even if not a TTY or NO_COLOR is set
-       COLORS_ENABLED = True
+def bg_bright_green(text: object) -> str:
+    """Wraps the input string with the 'BG_BRIGHT_GREEN' ANSI code (<ESC>[102m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[102m{string_to_color}{ENDC}"
 
-def disable_colors():
-    """Globally disables color output for ezcolors functions."""
-    global COLORS_ENABLED
-    COLORS_ENABLED = False
+def bg_bright_magenta(text: object) -> str:
+    """Wraps the input string with the 'BG_BRIGHT_MAGENTA' ANSI code (<ESC>[105m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[105m{string_to_color}{ENDC}"
 
-# --- ANSI Code Definitions ---
-class _ezcolors_codes:
-    """Internal class to hold the ANSI escape codes."""
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    DIM = '\033[2m'
-    ITALIC = '\033[3m'
-    UNDERLINE = '\033[4m'
-    BLINK = '\033[5m'
-    BLINK_RAPID = '\033[6m'
-    INVERSE = '\033[7m'
-    HIDDEN = '\033[8m'
-    STRIKETHROUGH = '\033[9m'
-    FG_BLACK = '\033[30m'
-    FG_RED = '\033[31m'
-    FG_GREEN = '\033[32m'
-    FG_YELLOW = '\033[33m'
-    FG_BLUE = '\033[34m'
-    FG_MAGENTA = '\033[35m'
-    FG_CYAN = '\033[36m'
-    FG_WHITE = '\033[37m'
-    BG_BLACK = '\033[40m'
-    BG_RED = '\033[41m'
-    BG_GREEN = '\033[42m'
-    BG_YELLOW = '\033[43m'
-    BG_BLUE = '\033[44m'
-    BG_MAGENTA = '\033[45m'
-    BG_CYAN = '\033[46m'
-    BG_WHITE = '\033[47m'
-    FG_BRIGHT_BLACK = '\033[90m'
-    FG_BRIGHT_RED = '\033[91m'
-    FG_BRIGHT_GREEN = '\033[92m'
-    FG_BRIGHT_YELLOW = '\033[93m'
-    FG_BRIGHT_BLUE = '\033[94m'
-    FG_BRIGHT_MAGENTA = '\033[95m'
-    FG_BRIGHT_CYAN = '\033[96m'
-    FG_BRIGHT_WHITE = '\033[97m'
-    BG_BRIGHT_BLACK = '\033[100m'
-    BG_BRIGHT_RED = '\033[101m'
-    BG_BRIGHT_GREEN = '\033[102m'
-    BG_BRIGHT_YELLOW = '\033[103m'
-    BG_BRIGHT_BLUE = '\033[104m'
-    BG_BRIGHT_MAGENTA = '\033[105m'
-    BG_BRIGHT_CYAN = '\033[106m'
-    BG_BRIGHT_WHITE = '\033[107m'
-    HEADER = FG_BRIGHT_MAGENTA
-    BLUE = FG_BRIGHT_BLUE
-    CYAN = FG_BRIGHT_CYAN
-    GREEN = FG_BRIGHT_GREEN
-    RED = FG_BRIGHT_RED
-    WARNING = FG_BRIGHT_YELLOW
-    FAIL = FG_BRIGHT_RED
+def bg_bright_red(text: object) -> str:
+    """Wraps the input string with the 'BG_BRIGHT_RED' ANSI code (<ESC>[101m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[101m{string_to_color}{ENDC}"
 
-# --- Function Generation Automation (with TTY Check) ---
+def bg_bright_white(text: object) -> str:
+    """Wraps the input string with the 'BG_BRIGHT_WHITE' ANSI code (<ESC>[107m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[107m{string_to_color}{ENDC}"
 
-def _create_color_func(color_code, end_code=_ezcolors_codes.ENDC):
-    """Factory to create a function that wraps a string with ANSI codes."""
-    def color_func(data_to_color):
-        string_to_color = str(data_to_color)
-        return f"{color_code}{string_to_color}{end_code}"
-    return color_func
+def bg_bright_yellow(text: object) -> str:
+    """Wraps the input string with the 'BG_BRIGHT_YELLOW' ANSI code (<ESC>[103m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[103m{string_to_color}{ENDC}"
 
-# Get the current module's dictionary (global namespace)
-_module_globals = globals()
+def bg_cyan(text: object) -> str:
+    """Wraps the input string with the 'BG_CYAN' ANSI code (<ESC>[46m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[46m{string_to_color}{ENDC}"
 
-# Iterate through the code definitions in the internal class
-for _name, _code in vars(_ezcolors_codes).items():
-    # Filter for valid codes
-    if _name.isupper() and isinstance(_code, str) and _code.startswith('\033') and _name != 'ENDC':
-        # Determine function name
-        _func_name = _name.lower()
-        _new_func = _create_color_func(_code, _ezcolors_codes.ENDC)
+def bg_green(text: object) -> str:
+    """Wraps the input string with the 'BG_GREEN' ANSI code (<ESC>[42m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[42m{string_to_color}{ENDC}"
 
-        # Set metadata
-        _new_func.__name__ = _func_name
-        _new_func.__doc__ = (
-            f"Wraps the input string with the '{_name}' ANSI code ({_code}).\n"
-            f"Color codes are only added if ezcolors.COLORS_ENABLED is True."
-        )
+def bg_magenta(text: object) -> str:
+    """Wraps the input string with the 'BG_MAGENTA' ANSI code (<ESC>[45m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[45m{string_to_color}{ENDC}"
 
-        _module_globals[_func_name] = _new_func
+def bg_red(text: object) -> str:
+    """Wraps the input string with the 'BG_RED' ANSI code (<ESC>[41m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[41m{string_to_color}{ENDC}"
 
-# # # --- Cleanup and Exports ---
-# Expose ENDC directly
-ENDC = _ezcolors_codes.ENDC
+def bg_white(text: object) -> str:
+    """Wraps the input string with the 'BG_WHITE' ANSI code (<ESC>[47m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[47m{string_to_color}{ENDC}"
 
-# Clean up internal variables
-del _create_color_func
-del _module_globals
-del _name
-del _code
-del _func_name
-del _new_func
-# del _ezcolors_codes # Required for testing. Can be removed otherwise
+def bg_yellow(text: object) -> str:
+    """Wraps the input string with the 'BG_YELLOW' ANSI code (<ESC>[43m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[43m{string_to_color}{ENDC}"
 
+def blink(text: object) -> str:
+    """Wraps the input string with the 'BLINK' ANSI code (<ESC>[5m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[5m{string_to_color}{ENDC}"
 
+def blink_rapid(text: object) -> str:
+    """Wraps the input string with the 'BLINK_RAPID' ANSI code (<ESC>[6m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[6m{string_to_color}{ENDC}"
 
-if __name__ == "__main__":
+def blue(text: object) -> str:
+    """Wraps the input string with the 'BLUE' ANSI code (<ESC>[94m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[94m{string_to_color}{ENDC}"
 
-    # --- Conditional Import for Debug Utility ---
-    # Try importing the utility only when running as main
-    _debug_utils_imported = False
-    print_sanitized_namespace = None # Define placeholder
-    try:
-        # Adjust import path as needed based on structure and how you run it
-        from debug_utils import print_sanitized_namespace
-        _debug_utils_imported = True
-    except ImportError:
-        pass # Silently ignore if debug util isn't available
+def bold(text: object) -> str:
+    """Wraps the input string with the 'BOLD' ANSI code (<ESC>[1m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[1m{string_to_color}{ENDC}"
 
-    # --- Argument Parsing ---
-    parser = argparse.ArgumentParser(
-        description="Run ezcolors examples or print sanitized module namespace.",
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Print the sanitized module namespace after generation."
-    )
-    args = parser.parse_args()
+def cyan(text: object) -> str:
+    """Wraps the input string with the 'CYAN' ANSI code (<ESC>[96m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[96m{string_to_color}{ENDC}"
 
-    # --- Action Based on Arguments ---
-    if args.debug:
-        if _debug_utils_imported and print_sanitized_namespace:
-            print("\n" + "="*20 + " DEBUGGING NAMESPACE (--debug) " + "="*20)
-            # Pass a *copy* of the globals() dictionary
-            print_sanitized_namespace(globals().copy(), title="--- ezcolors Module Globals (Post-Generation) ---")
-            print("="*70 + "\n")
-        else:
-            print("Error: --debug specified, but debug_utils could not be imported.", file=sys.stderr)
-            print("Ensure debug_utils.py is accessible in the Python path.", file=sys.stderr)
-            sys.exit(1)
-    else:
-        # --- Default Action: Run Examples ---
-        print("--- Testing Colors (Main Execution Examples) ---")
-        # Use try/except NameError for safety or explicitly check if functions exist
-        try:
-            # Make sure these generated function names exist in globals()
-            print(header("This is a header"))
-            print(okblue("This is blue"))
-            print(okcyan("This is cyan"))
-            print(okgreen("This is green"))
-            print(warning("This is a warning"))
-            print(fail("This is a failure"))
-            print(bold("This is bold"))
-            print(underline("This is underlined"))
-            print(bold(okblue("This is bold blue")))
-            print(f"You can mix: {warning('Warning')} and {okgreen('success')}")
-            print(f"Don't forget to end manually if needed: {bold('Bold continues...')} but now normal.")
-            # Add other examples...
-        except NameError as e:
-             print(f"\nError running examples: A required function might be missing ({e})", file=sys.stderr)
-             print("Check function generation logic or example names.", file=sys.stderr)
+def dim(text: object) -> str:
+    """Wraps the input string with the 'DIM' ANSI code (<ESC>[2m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[2m{string_to_color}{ENDC}"
+
+def fail(text: object) -> str:
+    """Wraps the input string with the 'FAIL' ANSI code (<ESC>[91m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[91m{string_to_color}{ENDC}"
+
+def fg_black(text: object) -> str:
+    """Wraps the input string with the 'FG_BLACK' ANSI code (<ESC>[30m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[30m{string_to_color}{ENDC}"
+
+def fg_blue(text: object) -> str:
+    """Wraps the input string with the 'FG_BLUE' ANSI code (<ESC>[34m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[34m{string_to_color}{ENDC}"
+
+def fg_bright_black(text: object) -> str:
+    """Wraps the input string with the 'FG_BRIGHT_BLACK' ANSI code (<ESC>[90m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[90m{string_to_color}{ENDC}"
+
+def fg_bright_blue(text: object) -> str:
+    """Wraps the input string with the 'FG_BRIGHT_BLUE' ANSI code (<ESC>[94m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[94m{string_to_color}{ENDC}"
+
+def fg_bright_cyan(text: object) -> str:
+    """Wraps the input string with the 'FG_BRIGHT_CYAN' ANSI code (<ESC>[96m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[96m{string_to_color}{ENDC}"
+
+def fg_bright_green(text: object) -> str:
+    """Wraps the input string with the 'FG_BRIGHT_GREEN' ANSI code (<ESC>[92m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[92m{string_to_color}{ENDC}"
+
+def fg_bright_magenta(text: object) -> str:
+    """Wraps the input string with the 'FG_BRIGHT_MAGENTA' ANSI code (<ESC>[95m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[95m{string_to_color}{ENDC}"
+
+def fg_bright_red(text: object) -> str:
+    """Wraps the input string with the 'FG_BRIGHT_RED' ANSI code (<ESC>[91m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[91m{string_to_color}{ENDC}"
+
+def fg_bright_white(text: object) -> str:
+    """Wraps the input string with the 'FG_BRIGHT_WHITE' ANSI code (<ESC>[97m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[97m{string_to_color}{ENDC}"
+
+def fg_bright_yellow(text: object) -> str:
+    """Wraps the input string with the 'FG_BRIGHT_YELLOW' ANSI code (<ESC>[93m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[93m{string_to_color}{ENDC}"
+
+def fg_cyan(text: object) -> str:
+    """Wraps the input string with the 'FG_CYAN' ANSI code (<ESC>[36m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[36m{string_to_color}{ENDC}"
+
+def fg_green(text: object) -> str:
+    """Wraps the input string with the 'FG_GREEN' ANSI code (<ESC>[32m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[32m{string_to_color}{ENDC}"
+
+def fg_magenta(text: object) -> str:
+    """Wraps the input string with the 'FG_MAGENTA' ANSI code (<ESC>[35m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[35m{string_to_color}{ENDC}"
+
+def fg_red(text: object) -> str:
+    """Wraps the input string with the 'FG_RED' ANSI code (<ESC>[31m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[31m{string_to_color}{ENDC}"
+
+def fg_white(text: object) -> str:
+    """Wraps the input string with the 'FG_WHITE' ANSI code (<ESC>[37m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[37m{string_to_color}{ENDC}"
+
+def fg_yellow(text: object) -> str:
+    """Wraps the input string with the 'FG_YELLOW' ANSI code (<ESC>[33m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[33m{string_to_color}{ENDC}"
+
+def green(text: object) -> str:
+    """Wraps the input string with the 'GREEN' ANSI code (<ESC>[92m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[92m{string_to_color}{ENDC}"
+
+def header(text: object) -> str:
+    """Wraps the input string with the 'HEADER' ANSI code (<ESC>[95m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[95m{string_to_color}{ENDC}"
+
+def hidden(text: object) -> str:
+    """Wraps the input string with the 'HIDDEN' ANSI code (<ESC>[8m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[8m{string_to_color}{ENDC}"
+
+def inverse(text: object) -> str:
+    """Wraps the input string with the 'INVERSE' ANSI code (<ESC>[7m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[7m{string_to_color}{ENDC}"
+
+def italic(text: object) -> str:
+    """Wraps the input string with the 'ITALIC' ANSI code (<ESC>[3m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[3m{string_to_color}{ENDC}"
+
+def red(text: object) -> str:
+    """Wraps the input string with the 'RED' ANSI code (<ESC>[91m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[91m{string_to_color}{ENDC}"
+
+def strikethrough(text: object) -> str:
+    """Wraps the input string with the 'STRIKETHROUGH' ANSI code (<ESC>[9m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[9m{string_to_color}{ENDC}"
+
+def underline(text: object) -> str:
+    """Wraps the input string with the 'UNDERLINE' ANSI code (<ESC>[4m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[4m{string_to_color}{ENDC}"
+
+def warning(text: object) -> str:
+    """Wraps the input string with the 'WARNING' ANSI code (<ESC>[93m)."""
+    # Explicitly convert to string
+    string_to_color = str(text)
+    return f"[93m{string_to_color}{ENDC}"

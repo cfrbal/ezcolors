@@ -1,29 +1,25 @@
 import pytest
 import sys
-import inspect
-
 import ezcolors
-from ezcolors import _ezcolors_codes
+# --- Remove dynamic discovery imports and logic ---
+# import inspect  # No longer needed
+# from tools._ezcolors_defs import _ezcolors_codes # No longer needed here
+# DELETE the loops that build functions_to_test dynamically
 
-functions_to_test = []
+# --- Import the generated list ---
+try:
+    # Import the list variable from the generated file
+    from functions_to_test_data import functions_to_test
+except ImportError:
+    # Handle case where the generated file doesn't exist or had import issues itself
+    print("ERROR: Could not import 'functions_to_test' from generated functions_to_test_data.py.", file=sys.stderr)
+    print("Ensure tools/gen_implementation.py has been run successfully and ezcolors is installed.", file=sys.stderr)
+    functions_to_test = [] # Define empty list so pytest doesn't crash at parametrize
 
-
-expected_func_names = set()
-for name in vars(_ezcolors_codes):
-    if name.isupper() and name != 'ENDC':
-        func_name = name.lower()
-        if func_name.startswith('ok'):
-            func_name = func_name[2:]
-        expected_func_names.add(func_name)
-
-for name, obj in inspect.getmembers(ezcolors):
-    if name in expected_func_names and inspect.isfunction(obj):
-        functions_to_test.append(obj)
-
-if not functions_to_test:
-     pytest.fail("Could not dynamically find any ezcolors functions to test.")
-
-
+# --- Sanity check (optional but good) ---
+# You could check here if the list is unexpectedly empty after import
+# if not functions_to_test:
+#     pytest.fail("The list of functions imported from test data is empty or import failed.")
 # --- Define the test ---
 @pytest.mark.parametrize("color_func", functions_to_test)
 def test_color_function_modifies_string(color_func):

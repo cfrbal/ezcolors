@@ -1,33 +1,50 @@
 # ezcolors
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<!-- Add other badges if you set up CI, PyPI etc. -->
+<!-- e.g., [![Build Status](...)](...) -->
+<!-- e.g., [![PyPI version](...)](...) -->
 
 A simple, lightweight Python module for adding ANSI color and style codes to terminal output with minimal effort and zero dependencies.
 
 Color your prints and terminal logs in an easy, modular, and straightforward way!
 
-## Why Metaprogramming?
+## Development Approach: Code Generation
 
-This module uses metaprogramming to dynamically generate the color/style functions from a list of ANSI codes. This was partly an exploration of Python's dynamic features, but it also makes adding new styles very simple – just add the code to the internal list, and the corresponding function becomes available automatically.
+This library uses a **build-time code generation** approach. Instead of generating functions dynamically every time the module is imported (runtime metaprogramming), a generator script (`tools/gen_implementation.py`) reads ANSI code definitions from a central file (`tools/_ezcolors_defs.py`) and creates several static files:
+
+1.  **`src/ezcolors.py`:** The main module containing explicitly defined Python functions (like `blue()`, `bold()`, etc.) for each code. This is the file users import.
+2.  **`src/ezcolors.pyi`:** A stub file providing type hints for all generated functions, enabling excellent IDE support (autocompletion, type checking) and linting.
+3.  **`src/__init__.py`:** Defines the package and its public API via `__all__`.
+4.  **`test/functions_to_test_data.py`:** Automatically generates a list of functions to be tested, ensuring the test suite stays synchronized with the generated code.
+
+**Advantages of this approach:**
+
+*   **Static Analysis Friendly:** Linters (like Pylint, Flake8) and type checkers (like MyPy, Pylance/Pyright) can perfectly understand the code, providing accurate feedback and preventing errors.
+*   **Excellent IDE Support:** Autocompletion, type hints, and function signature help work reliably in editors like VS Code and PyCharm.
+*   **Runtime Performance:** No overhead from runtime function generation during import. The code is plain, efficient Python.
+*   **Clarity & Debugging:** The generated `src/ezcolors.py` is standard Python code, making it easier to read, understand, and debug if needed.
+*   **Maintainability:** Adding new styles/colors requires editing only one definition file and re-running the generator.
+*   **Robust Testing:** Tests verify the behavior of statically defined functions, and the test parametrization is kept up-to-date automatically.
 
 ## Features
 
 *   **Easy to Use:** Simple function calls like `blue("text")` or `bold(warning("message"))`.
-*   **Zero Dependencies:** Uses only standard Python features.
-*   **Dynamic Generation:** Functions are automatically generated from defined ANSI codes, making extension easy.
+*   **Zero Dependencies:** Uses only standard Python features (apart from development tools like `pytest`).
+*   **Easy Maintenance via Code Generation:** Add new styles/colors easily by editing the definitions and running the generator.
 *   **Comprehensive Codes:** Includes common styles, standard foreground/background colors, and bright foreground/background colors.
-*   **Manual Reset:** Provides the `ENDC` constant for manual terminal state resets.
+*   **Type Hinted:** Provides `.pyi` stub files for excellent static analysis and IDE integration.
+*   **Manual Reset Constant:** Provides `ENDC` for manual terminal state resets.
 
 ## Installation
 
-There are a couple of ways to use `ezcolors`:
+**Option 1: Install from Local Clone (Recommended for Development/Contribution)**
 
-**Option 1: Install from Local Clone (Recommended for Development)**
-
-This method installs the package in "editable" mode, meaning changes you make to the source code are immediately reflected without reinstalling.
+This method installs the package in "editable" mode.
 
 1.  **Clone the repository:**
     ```bash
+    # Replace with your actual repo URL if different
     git clone https://github.com/cfrbal/ezcolors.git
     cd ezcolors
     ```
@@ -36,26 +53,22 @@ This method installs the package in "editable" mode, meaning changes you make to
     python -m venv .venv
     source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
     ```
-3.  **Install in editable mode:**
+3.  **Install dependencies (including pytest for testing):**
+    ```bash
+    # Assuming you add pytest to requirements-dev.txt or similar
+    # pip install -r requirements-dev.txt
+    # OR just install pytest directly for now:
+    pip install pytest
+    ```
+4.  **Install `ezcolors` in editable mode:**
     ```bash
     pip install -e .
     ```
     Now you can `import ezcolors` or `from ezcolors import ...` in your Python scripts within this environment.
 
-4. **Run some tests?**
+**Option 2: Install from PyPI**
 
-Once installed, run from the root of this repository:
-```
-pytest
-```
-
-**Option 2: Direct Copy**
-
-For very simple use cases, you can simply place the `src/ezcolors.py` file directly into your project directory or another location included in your Python path (`sys.path`). This is less maintainable if the `ezcolors` code is updated.
-
-**Option 3: Install from PyPI**
-
-Not available as of yet.
+*(Note: This requires packaging and uploading the project to the Python Package Index first.)*
 
 ```bash
 # pip install ezcolors # (Command once available on PyPI)
@@ -67,8 +80,10 @@ Import the desired color or style functions and wrap your strings:
 
 ```python
 from ezcolors import blue, bold, warning, green, fail
+from ezcolors import blue, bold, warning, green, fail
 
 # Basic coloring
+print(blue("This text is blue."))
 print(blue("This text is blue."))
 print(warning("This is a warning message."))
 
@@ -78,8 +93,7 @@ print(bold(fail("This is a bold failure message!")))
 # Use within f-strings
 status = "OK"
 record_id = 123
-# Assuming 'green' is generated (check your Available Functions list)
-print(f"Processing record {bold(record_id)}: Status = {green(status)}")
+print(f"Processing record {bold(record_id)}: Status = {green(status)}") # 'green' is an alias
 
 # Use directly in logging (see Considerations below)
 import logging
@@ -88,9 +102,40 @@ logger = logging.getLogger(__name__)
 logger.warning(f"Could not process file: {fail('file_not_found.txt')}")
 ```
 
+## Adding New Styles/Colors (Development)
+
+To add a new color or style:
+
+1.  **Edit the Definitions:** Open the file `tools/_ezcolors_defs.py`.
+2.  **Add the Code:** Inside the `_ezcolors_codes` class, add a new class attribute in the format:
+    ```python
+    # Example: Adding an ORANGE color (using 256-color code approximation)
+    ORANGE = '\033[38;5;208m'
+    # Example: Adding double underline (not widely supported)
+    DOUBLE_UNDERLINE = '\033[21m'
+    ```
+    Use uppercase names for the constants. Ensure the ANSI code string is correct.
+3.  **Run the Generator:** From the project's root directory, run the generation script:
+    ```bash
+    python tools/gen_implementation.py
+    ```
+    This will update `src/ezcolors.py`, `src/ezcolors.pyi`, `src/__init__.py`, and `test/functions_to_test_data.py`.
+4.  **Commit Changes:** If contributing to expand the available styles, add the modified `_ezcolors_defs.py` **and all the generated files** (`src/*`, `test/functions_to_test_data.py`) to your Git commit.
+
+## Running Tests
+
+Ensure you have installed the package editably (see Installation) and installed `pytest`.
+
+From the root directory of the repository, run:
+
+```bash
+pytest
+```
+The tests use the automatically generated `test/functions_to_test_data.py` to ensure all generated functions are tested.
+
 ## Available Functions and Constants
 
-The module automatically generates functions for the following styles and colors based on standard ANSI codes. You can import any of these directly:
+The module contains explicitly defined functions for the following styles and colors (generated from `tools/_ezcolors_defs.py`). You can import any of these directly:Add the modified `_ezcolors_defs.py` **and all the generated files** (`src/*`, `test/functions_to_test_data.py`) to your Git commit.
 
 **Styles:**
 
@@ -150,9 +195,12 @@ The module automatically generates functions for the following styles and colors
 
 **Semantic Aliases (Convenience Functions):**
 
-*(These point to some of the bright colors above)*
+*(These are generated by stripping the `OK` prefix from constants like `OKBLUE` and point to the corresponding bright colors)*
 
 *   `header` _(Bright Magenta)_
+*   `blue` _(Bright Blue)_
+*   `cyan` _(Bright Cyan)_
+*   `green` _(Bright Green)_
 *   `blue` _(Bright Blue)_
 *   `cyan` _(Bright Cyan)_
 *   `green` _(Bright Green)_
@@ -164,23 +212,6 @@ The module automatically generates functions for the following styles and colors
 *   `ENDC`: The ANSI code (`\033[0m`) to reset all attributes. The generated functions add this automatically, but it's exposed for manual use.
 
 ## Advanced Usage and Considerations
-### Debugging & Introspection
-
-When running the `ezcolors.py` script directly from the command line, you can inspect the final generated namespace (functions, constants, etc.) using the `--debug` flag. This uses the `debug_utils.py` helper script.
-
-**Purpose:**
-
-*   Lists all non-internal names available in the module after generation.
-*   Shows the type of each item.
-*   Safely displays the first line of function docstrings.
-*   Sanitizes output by replacing raw ANSI escape codes with `<ESC>` to avoid messing up your terminal.
-
-**How to Use:**
-
-1.  Navigate to this repository's root directory in the terminal.
-2.  Ensure your environment is set up (e.g., virtual environment activated, package installed with `pip install -e .`).
-3.  Run the ezcolor.py script using `python` with the `--debug` flag:
-
 
 ### Manual Control with `ENDC`
 
@@ -188,9 +219,11 @@ While functions automatically append the reset code, you might need `ENDC` for m
 
 ```python
 from ezcolors import bold, green, ENDC
+from ezcolors import bold, green, ENDC
 
 print(bold("Important section starts...")) # Manually start bold
 print(" - Detail 1")
+print(f" - Status: {green('All Good')}") # green() resets automatically
 print(f" - Status: {green('All Good')}") # green() resets automatically
 print(bold(" - More bold details"))       # Need to re-apply bold
 print("Section ends." + ENDC)             # Manually reset at the very end
@@ -198,36 +231,35 @@ print("Section ends." + ENDC)             # Manually reset at the very end
 
 ### Non-Terminal Output (Files, Pipes)
 
-`ezcolors` does **not** automatically detect if output is going to a file or pipe (i.e., not an interactive terminal). In such cases, the raw ANSI codes (e.g., `\033[94mblue\033[0m`) will be written to the output.
-
-If you need clean output in files, you must add checks manually:
+`ezcolors` does **not** automatically detect if output is going to a file or pipe. Raw ANSI codes will be written to non-terminal outputs. Check `sys.stdout.isatty()` manually if needed:
 
 ```python
 import sys
-from ezcolors import blue # Use the actual function name
+from ezcolors import blue
 
 text = "Hello"
 if sys.stdout.isatty():
+    print(blue(text))
     print(blue(text))
 else:
     print(text)
 ```
 
-Consider using a more feature-rich library like `colorama` (for cross-platform Windows activation) or `rich` if automatic detection or advanced features are required.
+Consider libraries like `colorama` or `rich` for more advanced handling.
 
 ### Terminal Compatibility
 
-ANSI escape codes are well-supported on modern Linux, macOS, and Windows 10/11 terminals. Older Windows command prompts (`cmd.exe`) might require libraries like `colorama` (`colorama.init()`) to enable ANSI interpretation. Some specific styles (like `italic`, `blink`) may not be supported by all terminal emulators.
+ANSI codes work well on modern terminals (Linux, macOS, Win10/11+). Older Windows `cmd.exe` may need `colorama`. Style support (`italic`, `blink`) varies.
 
-### No 256-Color or TrueColor Support
+### No 256-Color or TrueColor Support (by default)
 
-This module focuses on the basic 16 ANSI colors and styles. It does not include support for 256-color palettes or TrueColor (RGB) escape codes.
+The default definitions focus on basic 16 colors/styles. While you *could* add 256/TrueColor codes to `_ezcolors_defs.py` and regenerate, the primary focus is simplicity.
 
 ## Contributing
 
-Contributions are welcome, although the core functionality is quite simple. Feel free to submit issues for bugs or suggestions, or pull requests for improvements.
+Contributions are welcome! Feel free to submit issues for bugs or suggestions, or pull requests for improvements (especially to the generator or tests). Please ensure you run the generator (`python tools/gen_implementation.py`) and tests (`pytest`) before submitting a PR involving code changes.
 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
+```
