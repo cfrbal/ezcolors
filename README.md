@@ -4,17 +4,15 @@
 
 A simple, lightweight Python module for adding ANSI color and style codes to terminal output with minimal effort and zero dependencies.
 
-Color your prints/terminal logs in the most easy, modular, straightforward way possible!
+Color your prints and terminal logs in an easy, modular, and straightforward way!
 
-## Why are there no explicit function declarations?
+## Why Metaprogramming?
 
-Honestly? I just wanted to play around with some metaprogramming. Is it the best solution? Maybe not. Was it fun? YES. ç
-
-Either way, I provided a function to generate all of the declarations, in case you want a more "traditional" approach.
+This module uses metaprogramming to dynamically generate the color/style functions from a list of ANSI codes. This was partly an exploration of Python's dynamic features, but it also makes adding new styles very simple – just add the code to the internal list, and the corresponding function becomes available automatically.
 
 ## Features
 
-*   **Easy to Use:** Simple function calls like `blue("text")` or `bold(warning("message"))`.
+*   **Easy to Use:** Simple function calls like `okblue("text")` or `bold(warning("message"))`.
 *   **Zero Dependencies:** Uses only standard Python features.
 *   **Dynamic Generation:** Functions are automatically generated from defined ANSI codes, making extension easy.
 *   **Comprehensive Codes:** Includes common styles, standard foreground/background colors, and bright foreground/background colors.
@@ -22,248 +20,214 @@ Either way, I provided a function to generate all of the declarations, in case y
 
 ## Installation
 
-**Option 1: Direct Copy**
+There are a couple of ways to use `ezcolors`:
 
-Simply place the `ezcolors.py` file in your project directory or a location included in your Python path (`sys.path`).
+**Option 1: Install from Local Clone (Recommended for Development)**
 
-**Option 2: Install via pip (NOT YET SUPPORTED)**
+This method installs the package in "editable" mode, meaning changes you make to the source code are immediately reflected without reinstalling.
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/cfrbal/ezcolors.git
+    cd ezcolors
+    ```
+2.  **(Optional but Recommended) Create and activate a virtual environment:**
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
+    ```
+3.  **Install in editable mode:**
+    ```bash
+    pip install -e .
+    ```
+    Now you can `import ezcolors` or `from ezcolors import ...` in your Python scripts within this environment.
+
+4. **Run some tests?**
+
+Once installed, run from the root of this repository:
+```
+pytest
+```
+
+**Option 2: Direct Copy**
+
+For very simple use cases, you can simply place the `src/ezcolors.py` file directly into your project directory or another location included in your Python path (`sys.path`). This is less maintainable if the `ezcolors` code is updated.
+
+**Option 3: Install from PyPI**
+
+Not available as of yet.
+
+```bash
+# pip install ezcolors # (Command once available on PyPI)
+```
 
 ## Basic Usage
 
 Import the desired color or style functions and wrap your strings:
-`
+
+```python
 from ezcolors import okblue, bold, warning, okgreen, fail
-`
+
 # Basic coloring
-`
 print(okblue("This text is blue."))
 print(warning("This is a warning message."))
-`
+
 # Nesting styles
-`
 print(bold(fail("This is a bold failure message!")))
-`
+
 # Use within f-strings
-`
 status = "OK"
 record_id = 123
-print(f"Processing record {bold(record_id)}: Status = {green(status)}")
-`
+# Assuming 'okgreen' is generated (check your Available Functions list)
+print(f"Processing record {bold(record_id)}: Status = {okgreen(status)}")
+
 # Use directly in logging (see Considerations below)
-`
 import logging
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.warning(f"Could not process file: {fail('file_not_found.txt')}")
-`
-# Code
-The module automatically generates functions for the following styles and colors. You can import any of these directly:
+```
 
-Styles:
+## Available Functions and Constants
 
-bold(text)
+The module automatically generates functions for the following styles and colors based on standard ANSI codes. You can import any of these directly:
 
-dim(text)
+**Styles:**
 
-italic(text) (Terminal support varies)
+*   `bold`
+*   `dim`
+*   `italic` _(Terminal support varies)_
+*   `underline`
+*   `blink` _(Terminal support varies)_
+*   `blink_rapid` _(Terminal support varies)_
+*   `inverse` _(Swaps foreground/background)_
+*   `hidden` _(Not generally useful for display)_
+*   `strikethrough` _(Terminal support varies)_
 
-underline(text)
+**Foreground Colors (Standard):**
 
-blink(text) (Terminal support varies)
+*   `fg_black`
+*   `fg_red`
+*   `fg_green`
+*   `fg_yellow`
+*   `fg_blue`
+*   `fg_magenta`
+*   `fg_cyan`
+*   `fg_white`
 
-blink_rapid(text) (Terminal support varies)
+**Background Colors (Standard):**
 
-inverse(text) (Swaps foreground/background)
+*   `bg_black`
+*   `bg_red`
+*   `bg_green`
+*   `bg_yellow`
+*   `bg_blue`
+*   `bg_magenta`
+*   `bg_cyan`
+*   `bg_white`
 
-hidden(text) (Not generally useful for display)
+**Foreground Colors (Bright/High Intensity):**
 
-strikethrough(text) (Terminal support varies)
+*   `fg_bright_black` _(often Gray)_
+*   `fg_bright_red`
+*   `fg_bright_green`
+*   `fg_bright_yellow`
+*   `fg_bright_blue`
+*   `fg_bright_magenta`
+*   `fg_bright_cyan`
+*   `fg_bright_white`
 
-Foreground Colors (Standard):
+**Background Colors (Bright/High Intensity):**
 
-fg_black(text)
+*   `bg_bright_black` _(often Gray)_
+*   `bg_bright_red`
+*   `bg_bright_green`
+*   `bg_bright_yellow`
+*   `bg_bright_blue`
+*   `bg_bright_magenta`
+*   `bg_bright_cyan`
+*   `bg_bright_white`
 
-fg_red(text)
+**Semantic Aliases (Convenience Functions):**
 
-fg_green(text)
+*(These point to some of the bright colors above)*
 
-fg_yellow(text)
+*   `header` _(Bright Magenta)_
+*   `okblue` _(Bright Blue)_
+*   `okcyan` _(Bright Cyan)_
+*   `okgreen` _(Bright Green)_
+*   `warning` _(Bright Yellow)_
+*   `fail` _(Bright Red)_
 
-fg_blue(text)
+**Reset Constant:**
 
-fg_magenta(text)
+*   `ENDC`: The ANSI code (`\033[0m`) to reset all attributes. The generated functions add this automatically, but it's exposed for manual use.
 
-fg_cyan(text)
+## Advanced Usage and Considerations
+### Debugging & Introspection
 
-fg_white(text)
+When running the `ezcolors.py` script directly from the command line, you can inspect the final generated namespace (functions, constants, etc.) using the `--debug` flag. This uses the `debug_utils.py` helper script.
 
-Background Colors (Standard):
+**Purpose:**
 
-bg_black(text)
+*   Lists all non-internal names available in the module after generation.
+*   Shows the type of each item.
+*   Safely displays the first line of function docstrings.
+*   Sanitizes output by replacing raw ANSI escape codes with `<ESC>` to avoid messing up your terminal.
 
-bg_red(text)
+**How to Use:**
 
-bg_green(text)
+1.  Navigate to this repository's root directory in the terminal.
+2.  Ensure your environment is set up (e.g., virtual environment activated, package installed with `pip install -e .`).
+3.  Run the ezcolor.py script using `python` with the `--debug` flag:
 
-bg_yellow(text)
 
-bg_blue(text)
+### Manual Control with `ENDC`
 
-bg_magenta(text)
+While functions automatically append the reset code, you might need `ENDC` for manual construction or multi-line styling:
 
-bg_cyan(text)
-
-bg_white(text)
-
-Foreground Colors (Bright/High Intensity):
-
-fg_bright_black(text) (often Gray)
-
-fg_bright_red(text)
-
-fg_bright_green(text)
-
-fg_bright_yellow(text)
-
-fg_bright_blue(text)
-
-fg_bright_magenta(text)
-
-fg_bright_cyan(text)
-
-fg_bright_white(text)
-
-Background Colors (Bright/High Intensity):
-
-bg_bright_black(text) (often Gray)
-
-bg_bright_red(text)
-
-bg_bright_green(text)
-
-bg_bright_yellow(text)
-
-bg_bright_blue(text)
-
-bg_bright_magenta(text)
-
-bg_bright_cyan(text)
-
-bg_bright_white(text)
-
-Semantic Aliases (Convenience Functions):
-
-These point to some of the bright colors above:
-
-header(text) (Bright Magenta)
-
-okblue(text) (Bright Blue)
-
-okcyan(text) (Bright Cyan)
-
-okgreen(text) (Bright Green)
-
-warning(text) (Bright Yellow)
-
-fail(text) (Bright Red)
-
-Reset Constant:
-
-ENDC: The ANSI code (\033[0m) to reset all attributes. The generated functions add this automatically, but it's exposed for manual use.
-
-Advanced Usage and Considerations
-Manual Control with ENDC
-
-While functions automatically append the reset code, you might need ENDC for manual construction or multi-line styling:
-`
+```python
 from ezcolors import bold, okgreen, ENDC
 
 print(bold("Important section starts...")) # Manually start bold
 print(" - Detail 1")
-print(f" - Status: {green('All Good')}") # green() resets automatically
+print(f" - Status: {okgreen('All Good')}") # okgreen() resets automatically
 print(bold(" - More bold details"))       # Need to re-apply bold
 print("Section ends." + ENDC)             # Manually reset at the very end
-`
+```
 
-ezcolors does not automatically detect if output is going to a file or pipe (i.e., not an interactive terminal). In such cases, the raw ANSI codes (e.g., \033[94mblue\033[0m) will be written to the output.
+### Non-Terminal Output (Files, Pipes)
+
+`ezcolors` does **not** automatically detect if output is going to a file or pipe (i.e., not an interactive terminal). In such cases, the raw ANSI codes (e.g., `\033[94mblue\033[0m`) will be written to the output.
 
 If you need clean output in files, you must add checks manually:
-`
+
+```python
 import sys
-from ezcolors import blue
+from ezcolors import okblue # Use the actual function name
 
 text = "Hello"
 if sys.stdout.isatty():
     print(okblue(text))
 else:
     print(text)
-`
+```
 
-Consider using a more feature-rich library like colorama (for cross-platform Windows activation) or rich if automatic detection or advanced features are required.
+Consider using a more feature-rich library like `colorama` (for cross-platform Windows activation) or `rich` if automatic detection or advanced features are required.
 
-Terminal Compatibility
+### Terminal Compatibility
 
-ANSI escape codes are well-supported on modern Linux, macOS, and Windows 10/11 terminals. Older Windows command prompts (cmd.exe) might require libraries like colorama (colorama.init()) to enable ANSI interpretation. Some specific styles (like italic, blink) may not be supported by all terminal emulators.
+ANSI escape codes are well-supported on modern Linux, macOS, and Windows 10/11 terminals. Older Windows command prompts (`cmd.exe`) might require libraries like `colorama` (`colorama.init()`) to enable ANSI interpretation. Some specific styles (like `italic`, `blink`) may not be supported by all terminal emulators.
 
-No 256-Color or TrueColor Support
+### No 256-Color or TrueColor Support
 
 This module focuses on the basic 16 ANSI colors and styles. It does not include support for 256-color palettes or TrueColor (RGB) escape codes.
 
-Contributing
+## Contributing
 
-Contributions are welcome although I don't think there's much to do. This library is ridiculously simple.
+Contributions are welcome, although the core functionality is quite simple. Feel free to submit issues for bugs or suggestions, or pull requests for improvements.
 
-Please feel free to submit issues or pull requests. (Add more specific contribution guidelines if desired).
+## License
 
-License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-This project is licensed under the MIT License - see the LICENSE file for details (You'll need to create a LICENSE file, typically containing the MIT license text).
-
-# Complete function list:
-Name: bold                 | Type: function        | Doc: Wraps the input string with the 'BOLD' ANSI code (<ESC>[1m).
-Name: dim                  | Type: function        | Doc: Wraps the input string with the 'DIM' ANSI code (<ESC>[2m).
-Name: italic               | Type: function        | Doc: Wraps the input string with the 'ITALIC' ANSI code (<ESC>[3m).
-Name: underline            | Type: function        | Doc: Wraps the input string with the 'UNDERLINE' ANSI code (<ESC>[4m).
-Name: blink                | Type: function        | Doc: Wraps the input string with the 'BLINK' ANSI code (<ESC>[5m).
-Name: blink_rapid          | Type: function        | Doc: Wraps the input string with the 'BLINK_RAPID' ANSI code (<ESC>[6m).
-Name: inverse              | Type: function        | Doc: Wraps the input string with the 'INVERSE' ANSI code (<ESC>[7m).
-Name: hidden               | Type: function        | Doc: Wraps the input string with the 'HIDDEN' ANSI code (<ESC>[8m).
-Name: strikethrough        | Type: function        | Doc: Wraps the input string with the 'STRIKETHROUGH' ANSI code (<ESC>[9m).
-Name: fg_black             | Type: function        | Doc: Wraps the input string with the 'FG_BLACK' ANSI code (<ESC>[30m).
-Name: fg_red               | Type: function        | Doc: Wraps the input string with the 'FG_RED' ANSI code (<ESC>[31m).
-Name: fg_green             | Type: function        | Doc: Wraps the input string with the 'FG_GREEN' ANSI code (<ESC>[32m).
-Name: fg_yellow            | Type: function        | Doc: Wraps the input string with the 'FG_YELLOW' ANSI code (<ESC>[33m).
-Name: fg_blue              | Type: function        | Doc: Wraps the input string with the 'FG_BLUE' ANSI code (<ESC>[34m).
-Name: fg_magenta           | Type: function        | Doc: Wraps the input string with the 'FG_MAGENTA' ANSI code (<ESC>[35m).
-Name: fg_cyan              | Type: function        | Doc: Wraps the input string with the 'FG_CYAN' ANSI code (<ESC>[36m).
-Name: fg_white             | Type: function        | Doc: Wraps the input string with the 'FG_WHITE' ANSI code (<ESC>[37m).
-Name: bg_black             | Type: function        | Doc: Wraps the input string with the 'BG_BLACK' ANSI code (<ESC>[40m).
-Name: bg_red               | Type: function        | Doc: Wraps the input string with the 'BG_RED' ANSI code (<ESC>[41m).
-Name: bg_green             | Type: function        | Doc: Wraps the input string with the 'BG_GREEN' ANSI code (<ESC>[42m).
-Name: bg_yellow            | Type: function        | Doc: Wraps the input string with the 'BG_YELLOW' ANSI code (<ESC>[43m).
-Name: bg_blue              | Type: function        | Doc: Wraps the input string with the 'BG_BLUE' ANSI code (<ESC>[44m).
-Name: bg_magenta           | Type: function        | Doc: Wraps the input string with the 'BG_MAGENTA' ANSI code (<ESC>[45m).
-Name: bg_cyan              | Type: function        | Doc: Wraps the input string with the 'BG_CYAN' ANSI code (<ESC>[46m).
-Name: bg_white             | Type: function        | Doc: Wraps the input string with the 'BG_WHITE' ANSI code (<ESC>[47m).
-Name: fg_bright_black      | Type: function        | Doc: Wraps the input string with the 'FG_BRIGHT_BLACK' ANSI code (<ESC>[90m).
-Name: fg_bright_red        | Type: function        | Doc: Wraps the input string with the 'FG_BRIGHT_RED' ANSI code (<ESC>[91m).
-Name: fg_bright_green      | Type: function        | Doc: Wraps the input string with the 'FG_BRIGHT_GREEN' ANSI code (<ESC>[92m).
-Name: fg_bright_yellow     | Type: function        | Doc: Wraps the input string with the 'FG_BRIGHT_YELLOW' ANSI code (<ESC>[93m).
-Name: fg_bright_blue       | Type: function        | Doc: Wraps the input string with the 'FG_BRIGHT_BLUE' ANSI code (<ESC>[94m).
-Name: fg_bright_magenta    | Type: function        | Doc: Wraps the input string with the 'FG_BRIGHT_MAGENTA' ANSI code (<ESC>[95m).
-Name: fg_bright_cyan       | Type: function        | Doc: Wraps the input string with the 'FG_BRIGHT_CYAN' ANSI code (<ESC>[96m).
-Name: fg_bright_white      | Type: function        | Doc: Wraps the input string with the 'FG_BRIGHT_WHITE' ANSI code (<ESC>[97m).
-Name: bg_bright_black      | Type: function        | Doc: Wraps the input string with the 'BG_BRIGHT_BLACK' ANSI code (<ESC>[100m).
-Name: bg_bright_red        | Type: function        | Doc: Wraps the input string with the 'BG_BRIGHT_RED' ANSI code (<ESC>[101m).
-Name: bg_bright_green      | Type: function        | Doc: Wraps the input string with the 'BG_BRIGHT_GREEN' ANSI code (<ESC>[102m).
-Name: bg_bright_yellow     | Type: function        | Doc: Wraps the input string with the 'BG_BRIGHT_YELLOW' ANSI code (<ESC>[103m).
-Name: bg_bright_blue       | Type: function        | Doc: Wraps the input string with the 'BG_BRIGHT_BLUE' ANSI code (<ESC>[104m).
-Name: bg_bright_magenta    | Type: function        | Doc: Wraps the input string with the 'BG_BRIGHT_MAGENTA' ANSI code (<ESC>[105m).
-Name: bg_bright_cyan       | Type: function        | Doc: Wraps the input string with the 'BG_BRIGHT_CYAN' ANSI code (<ESC>[106m).
-Name: bg_bright_white      | Type: function        | Doc: Wraps the input string with the 'BG_BRIGHT_WHITE' ANSI code (<ESC>[107m).
-Name: header               | Type: function        | Doc: Wraps the input string with the 'HEADER' ANSI code (<ESC>[95m).
-Name: okblue               | Type: function        | Doc: Wraps the input string with the 'OKBLUE' ANSI code (<ESC>[94m).
-Name: okcyan               | Type: function        | Doc: Wraps the input string with the 'OKCYAN' ANSI code (<ESC>[96m).
-Name: okgreen              | Type: function        | Doc: Wraps the input string with the 'OKGREEN' ANSI code (<ESC>[92m).
-Name: warning              | Type: function        | Doc: Wraps the input string with the 'WARNING' ANSI code (<ESC>[93m).
-Name: fail                 | Type: function        | Doc: Wraps the input string with the 'FAIL' ANSI code (<ESC>[91m).
